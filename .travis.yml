@@ -1,0 +1,18 @@
+dist: trusty
+
+cron:
+  - branch: master
+    interval: monthly
+    options: always run
+
+jobs:
+  include:
+    - stage: build docker image
+      script:
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - docker build -t cibiltech/default-image .
+      - docker tag cibiltech/default-image cibiltech/default-image:latest
+      - docker push cibiltech/default-image
+    - stage: test
+      script: docker run --rm cibiltech/default-image help
+    - script: docker run --rm cibiltech/default-image help
